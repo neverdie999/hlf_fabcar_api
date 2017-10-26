@@ -13,4 +13,7 @@ module.exports = function(app) {
 	app.route('/asset/:peerId/:key')
 		.get(controller.getItem)
 		.put(controller.putItem);
+	
+	app.route('/asset/query/:peerId/:key')
+		.get(controller.getItemByQuery);
 };
