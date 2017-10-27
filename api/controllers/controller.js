@@ -30,7 +30,7 @@ exports.getItem = function(req, res) {
 	return hfc_code.invoke(options, res);
 }
 
-exports.getItemByQuery = function(req, res) {
+exports.getItemByOwner = function(req, res) {
 	const hfc_code = require('../../hfc_codes/get_item');
 	let options = {
 	    wallet_path: path.join(__dirname, '../../creds'),
@@ -45,6 +45,23 @@ exports.getItemByQuery = function(req, res) {
 	};
 	return hfc_code.invoke(options, res);
 }
+
+exports.getItemByColour = function(req, res) {
+	const hfc_code = require('../../hfc_codes/get_item');
+	let options = {
+	    wallet_path: path.join(__dirname, '../../creds'),
+	    user_id: req.params.peerId,
+	    channel_id: 'mychannel',
+	    chaincode_id: 'fabcar',
+   	    command: 'queryByColour',
+   	    args: [req.params.key],
+	    peer_url: 'grpc://localhost:7051',
+		event_url: 'grpc://localhost:7053',
+		orderer_url: 'grpc://localhost:7050',
+	};
+	return hfc_code.invoke(options, res);
+}
+
 
 exports.putItem = function(req, res) {
 	const hfc_code = require('../../hfc_codes/put_item');
@@ -61,5 +78,3 @@ exports.putItem = function(req, res) {
 	};
 	return hfc_code.invoke(options, res);
 }
-
-
