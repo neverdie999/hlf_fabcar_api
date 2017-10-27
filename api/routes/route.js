@@ -13,7 +13,11 @@ module.exports = function(app) {
 	app.route('/asset/:peerId/:key')
 		.get(controller.getItem)
 		.put(controller.putItem);
-	
-	app.route('/asset/query/:peerId/:key')
-		.get(controller.getItemByQuery);
+
+	app.route('/asset/:peerId/owner/:key')
+		.get(controller.getItemByOwner);
+
+	app.route('/asset/:peerId/colour/:key')
+		.get(controller.getItemByColour);
+
 };
