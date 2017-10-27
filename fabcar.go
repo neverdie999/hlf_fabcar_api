@@ -68,8 +68,6 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	function, args := APIstub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger appropriately
 
-	fmt.Printf("Function Name: %s\n", function);
-
 	if function == "queryCar" {
 		return s.queryCar(APIstub, args)
 	} else if function == "initLedger" {
@@ -82,9 +80,11 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.changeCarOwner(APIstub, args)
 	} else if function == "queryByOwner" {
 		return s.queryByOwner(APIstub, args)
+	} else if function == "queryByColour" {
+		return s.queryByColour(APIstub, args)
 	}
 
-	return shim.Error("Invalid Smart Contract function name.")
+	return shim.Error("Invalid Smart Contract function name: " + function)
 }
 
 func (s *SmartContract) queryCar(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -109,6 +109,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 		Car{Make: "Fiat", Model: "Punto", Colour: "violet", Owner: "Pari"},
 		Car{Make: "Tata", Model: "Nano", Colour: "indigo", Owner: "Valeria"},
 		Car{Make: "Holden", Model: "Barina", Colour: "brown", Owner: "Shotaro"},
+		Car{Make: "Kia", Model: "K5", Colour: "brown", Owner: "Hyunwoo"},
 	}
 
 	i := 0
@@ -206,7 +207,7 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 
 	owner := args[0]
 
-	queryString := fmt.Sprintf("{\"selector\":{\"Owner\":\"%s\"}}", owner)
+	queryString := fmt.Sprintf("{\"selector\":{\"owner\":\"%s\"}}", owner)
 
 	queryResults, err := s.getQueryResultForQueryString(APIstub, queryString)
 	if err != nil {
@@ -214,6 +215,24 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 	}
 	return shim.Success(queryResults)
 }
+
+func (s *SmartContract) queryByColour(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	colour := args[0]
+
+	queryString := fmt.Sprintf("{\"selector\":{\"colour\":\"%s\"}}", colour)
+
+	queryResults, err := s.getQueryResultForQueryString(APIstub, queryString)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(queryResults)
+}
+
 
 func (s *SmartContract) getQueryResultForQueryString(stub shim.ChaincodeStubInterface, queryString string) ([]byte, error) {
 
@@ -259,7 +278,7 @@ func (s *SmartContract) getQueryResultForQueryString(stub shim.ChaincodeStubInte
 
 // The main function is only relevant in unit test mode. Only included here for completeness.
 func main() {
-
+	
 	// Create a new Smart Contract
 	err := shim.Start(new(SmartContract))
 	if err != nil {
